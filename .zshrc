@@ -1,12 +1,19 @@
 #!/bin/zsh
 # ─── terminal-setup: Zsh config ─────────────────────────────────────
-# Powered by: Starship + zsh-autosuggestions + zsh-syntax-highlighting + fzf + fnm
+# Starship + zsh-autosuggestions + zsh-syntax-highlighting 
 
 # ─── Homebrew ────────────────────────────────────────────────────────
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
+# ─── FFmpeg (Homebrew ffmpeg-full, keg-only) ────────────────────────
+export PATH="/opt/homebrew/opt/ffmpeg-full/bin:$PATH"
+
 # ─── Starship prompt ────────────────────────────────────────────────
-eval "$(starship init zsh)"
+# Enabling Starship in Ghostty, specially.
+if [[ "${TERM_PROGRAM:l}" == "ghostty" ]]; then
+    export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+    eval "$(starship init zsh)"
+fi
 
 # ─── Zsh plugins (via Homebrew) ──────────────────────────────────────
 # Syntax highlighting (must be before autosuggestions for best results)
@@ -44,25 +51,9 @@ setopt HIST_IGNORE_SPACE
 setopt SHARE_HISTORY
 setopt INC_APPEND_HISTORY
 
-# ─── fzf ─────────────────────────────────────────────────────────────
-if [[ -f ~/.fzf.zsh ]]; then
-    source ~/.fzf.zsh
-elif command -v fzf &>/dev/null; then
-    eval "$(fzf --zsh 2>/dev/null)"
-fi
-export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-# Use fd for fzf if available
-if command -v fd &>/dev/null; then
-    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
-fi
-
 # ─── Zoxide (smart cd) ──────────────────────────────────────────────
 eval "$(zoxide init zsh)"
 
-# ─── fnm (Node version manager) ─────────────────────────────────────
-eval "$(fnm env --use-on-cd --shell zsh)"
 
 # ─── Aliases ─────────────────────────────────────────────────────────
 alias ls='eza --icons --group-directories-first'
@@ -72,11 +63,82 @@ alias cat='bat'
 alias find='fd'
 alias grep='rg'
 alias top='btop'
-alias lg='lazygit'
 
-# ─── pnpm ────────────────────────────────────────────────────────────
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-    *":$PNPM_HOME:"*) ;;
-    *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+
+# ─── User environment ───────────────────────────────────────────────
+# Added by Antigravity
+export PATH="/Users/utolaris/.antigravity/antigravity/bin:$PATH"
+
+# uv
+eval "$(uv generate-shell-completion zsh)"
+
+# Bash `mapfile`/`readarray` compatibility for zsh.
+if ! whence -w mapfile >/dev/null 2>&1; then
+    mapfile() {
+        emulate -L zsh
+        setopt localoptions noshwordsplit
+
+        local trim_newlines=0 opt
+        while getopts ":t" opt; do
+            case "$opt" in
+                t) trim_newlines=1 ;;
+                \?)
+                    print -u2 "mapfile: unsupported option -- $OPTARG"
+                    return 2
+                    ;;
+            esac
+        done
+        shift $((OPTIND - 1))
+
+        local array_name="${1:-MAPFILE}"
+        local -a lines=()
+        local line
+
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            if (( trim_newlines )); then
+                lines+=("$line")
+            else
+                lines+=("$line"$'\n')
+            fi
+        done
+
+        typeset -g -a "$array_name"
+        eval "$array_name=(${(j: :)${(q)lines[@]}})"
+    }
+
+    alias readarray='mapfile'
+fi
+
+export PATH="/Users/utolaris/Documents/ai/stata-cli/skill/stata-cli/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/utolaris/.local/bin:$PATH"
+
+# mimocode
+export PATH=/Users/utolaris/.bun/bin:/Users/utolaris/.mimocode/bin:$PATH
+
+# Tushare API token from macOS Keychain (service: tushare-token)
+# Store once: security add-generic-password -U -a "$USER" -s tushare-token -w 'YOUR_TOKEN'
+export TUSHARE_TOKEN="$(security find-generic-password -a "$USER" -s tushare-token -w 2>/dev/null)"
+
+
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<
+
+# PyGhidra
+export GHIDRA_INSTALL_DIR="/opt/homebrew/opt/ghidra/libexec"
+
+# ─── Quick text transfer ────────────────────────────────────────────
+# Set TEXT_SYNC_HOST to override the default SSH host: export TEXT_SYNC_HOST=kali
+sendtext() {
+    pbpaste | ssh "${TEXT_SYNC_HOST:-kali}" '~/.local/bin/kclip'
+}
+
+gettext() {
+    ssh "${TEXT_SYNC_HOST:-kali}" '~/.local/bin/kclip get' | pbcopy
+}

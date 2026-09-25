@@ -6,8 +6,11 @@
 
 ## 配置内容
 
-- `.zshrc`：Zsh 的 shell 配置，包含 prompt、插件、别名和常用工具默认设置。原始文件中的敏感 `env` 段已排除。
+- `.zshrc`：Zsh 的 shell 配置，包含 prompt、插件、别名和常用工具默认设置。`TUSHARE_TOKEN` 等密钥从 macOS 钥匙串读取，不落盘明文。
 - `ghostty/config`：Ghostty 终端配置，主要包括字体、主题、透明度、窗口行为和输入体验。
+- `starship.toml`：Starship 提示符主题（Catppuccin Mocha）。
+
+> 同步自本机 `~/.zshrc`、`~/.config/ghostty/config`、`~/.config/starship.toml`（2026-09-25）。
 
 ## 使用教程
 
@@ -24,13 +27,13 @@
 
 ## 加载的插件和集成
 
-- Starship prompt（美化提示符，并显示路径、分支和状态信息）
+- Starship prompt（美化提示符，并显示路径、分支和状态信息；仅在 Ghostty 下启用）
 - zsh-syntax-highlighting（输入时高亮命令，减少拼写错误）
 - zsh-autosuggestions（根据历史命令自动补全建议）
 - zsh-completions（补充更多命令补全能力，配合 `fpath` 和 `compinit` 使用）
-- `fzf` shell 集成（模糊搜索历史命令和文件路径）
 - `zoxide`（更快跳转常用目录）
-- `fnm`（管理 Node.js 版本并按目录自动切换）
+- `uv` shell 补全
+- `eza` / `bat` / `fd` / `rg` / `btop` 别名替换常用命令
 
 ## 优势
 
