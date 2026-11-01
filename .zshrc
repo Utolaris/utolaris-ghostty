@@ -9,8 +9,8 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 export PATH="/opt/homebrew/opt/ffmpeg-full/bin:$PATH"
 
 # ─── Starship prompt ────────────────────────────────────────────────
-# Enabling Starship in Ghostty, specially.
-if [[ "${TERM_PROGRAM:l}" == "ghostty" ]]; then
+# Enable Starship in Ghostty and ELYTerminal (detected by its shell integration).
+if [[ "${TERM_PROGRAM:l}" == "ghostty" ]] || (( $+functions[_ely_precmd] )); then
     export STARSHIP_CONFIG="$HOME/.config/starship.toml"
     eval "$(starship init zsh)"
 fi
@@ -66,8 +66,6 @@ alias top='btop'
 
 
 # ─── User environment ───────────────────────────────────────────────
-# Added by Antigravity
-export PATH="/Users/utolaris/.antigravity/antigravity/bin:$PATH"
 
 # uv
 eval "$(uv generate-shell-completion zsh)"
@@ -120,7 +118,6 @@ export PATH="/Users/utolaris/.local/bin:$PATH"
 export PATH=/Users/utolaris/.bun/bin:/Users/utolaris/.mimocode/bin:$PATH
 
 # Tushare API token from macOS Keychain (service: tushare-token)
-# Store once: security add-generic-password -U -a "$USER" -s tushare-token -w 'YOUR_TOKEN'
 export TUSHARE_TOKEN="$(security find-generic-password -a "$USER" -s tushare-token -w 2>/dev/null)"
 
 
@@ -142,3 +139,6 @@ sendtext() {
 gettext() {
     ssh "${TEXT_SYNC_HOST:-kali}" '~/.local/bin/kclip get' | pbcopy
 }
+
+# bun completions
+[ -s "/Users/utolaris/.bun/_bun" ] && source "/Users/utolaris/.bun/_bun"
