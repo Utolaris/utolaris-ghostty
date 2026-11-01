@@ -10,7 +10,7 @@
 - `ghostty/config`：Ghostty 终端配置，主要包括字体、主题、透明度、窗口行为和输入体验。
 - `starship.toml`：Starship 提示符主题（Catppuccin Mocha）。
 
-> 同步自本机 `~/.zshrc`、`~/.config/ghostty/config`、`~/.config/starship.toml`（2026-09-25）。
+> 同步自本机 `~/.zshrc`、`~/.config/ghostty/config`、`~/.config/starship.toml`（2026-11-01）。
 
 ## 使用教程
 
@@ -27,7 +27,7 @@
 
 ## 加载的插件和集成
 
-- Starship prompt（美化提示符，并显示路径、分支和状态信息；仅在 Ghostty 下启用）
+- Starship prompt（美化提示符，并显示路径、分支和状态信息；在 Ghostty 和 ELYTerminal 下启用）
 - zsh-syntax-highlighting（输入时高亮命令，减少拼写错误）
 - zsh-autosuggestions（根据历史命令自动补全建议）
 - zsh-completions（补充更多命令补全能力，配合 `fpath` 和 `compinit` 使用）
